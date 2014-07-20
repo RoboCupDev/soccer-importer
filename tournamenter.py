@@ -22,13 +22,13 @@ class Tournamenter(object):
                 raise ValueError("Wrong password or URL")
 
     def login(self, password):
-        r = self.session.post(self.url + '/login', {'password': password}) 
+        r = self.session.post(self.url + '/login', {'password': password})
         return False if 'Wrong Password' in r.content else True
 
 
     def add_team(self, name, country):
-        r = self.session.post(self.url + '/teams', 
-                json.dumps({ 
+        r = self.session.post(self.url + '/teams',
+                json.dumps({
                     "name": name,
                     "country": country}
                 ),
@@ -38,6 +38,21 @@ class Tournamenter(object):
             r.content
 
         return r.json()
+
+    def find_group_id(self, name):
+        r = self.session.post(self.url + '/groups/find',
+                json.dumps({
+                    "name": name
+                }),
+                headers={'content-type': 'application/json'})
+
+        out = r.json()
+
+        if len(out) == 0:
+            return None
+
+        return out[0]['id']
+
 
     def load_teams(self):
         r = self.session.get(self.url + '/teams')
@@ -50,18 +65,20 @@ class Tournamenter(object):
 
         return self.teams[name]
 
-    def add_match(self, teamA, teamB, day, field, time, groupID,
+    def add_match(self, teamA, teamB, day, field, time, group,
             state="scheduled"):
 
         if type(teamA) != "int":
             teamA = self.team_info(teamA)['id']
         if type(teamB) != "int":
             teamB = self.team_info(teamB)['id']
+        if type(group) != "int":
+            group = self.find_group_id(group)
 
         r = self.session.post(self.url + '/matches', json.dumps({
                 'teamAId': teamA,
                 'teamBId': teamB,
-                'groupId': groupID,
+                'groupId': group,
                 'day': day,
                 'field': field,
                 'hour': time,
@@ -70,7 +87,7 @@ class Tournamenter(object):
 
         if r.status_code != 201:
             return r.content
-        
+
         return r.json()
 
     def find_match_id(self, teamA, teamB, field, day):
@@ -116,7 +133,7 @@ class Tournamenter(object):
 
 if __name__ == "__main__":
     t = Tournamenter('http://localhost:1337', '12345')
-    t.add_match("Brazil", "Argentina", "1", "A", "12:00", 3)
+    t.add_match("Brazil", "Argentina", "1", "A", "12:00", 'testing group')
 
     print(t.find_match_id("Brazil", "Argentina", "A", 1))
 
