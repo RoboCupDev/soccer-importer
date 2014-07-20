@@ -73,9 +73,52 @@ class Tournamenter(object):
         
         return r.json()
 
-         
+    def find_match_id(self, teamA, teamB, field, day):
+
+        if type(teamA) != "int":
+            teamA = self.team_info(teamA)['id']
+        if type(teamB) != "int":
+            teamB = self.team_info(teamB)['id']
+
+        r = self.session.post(self.url + '/matches/find', json.dumps({
+                'teamAId': teamA,
+                'teamBId': teamB,
+                'field': field,
+                'day': day
+            }), headers={'content-type': 'application/json'})
+
+
+        out = r.json()
+
+        if len(out) == 0:
+            return None
+
+        return r.json()[0]['id']
+
+
+    def update_match(self, teamA, teamB, field, day, teamAScore, teamBScore):
+        id = self.find_match_id(teamA, teamB, field, day)
+
+        r =  self.session.post(self.url + '/matches/update', json.dumps({
+                'teamAId': teamA,
+                'teamBId': teamB,
+                'field': field,
+                'day': day,
+                'teamAScore': teamAScore,
+                'teamBScore': teamBScore,
+                'id': id
+            }), headers={'content-type': 'application/json'})
+
+        if r.status_code != 200:
+            return r.content
+
+        return r.json()
 
 if __name__ == "__main__":
     t = Tournamenter('http://localhost:1337', '12345')
     t.add_match("Brazil", "Argentina", "1", "A", "12:00", 3)
+
+    print(t.find_match_id("Brazil", "Argentina", "A", 1))
+
+    t.update_match("Brazil", "Argentina", "A", 1, 5, 4)
 
