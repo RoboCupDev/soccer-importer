@@ -35,7 +35,7 @@ class Tournamenter(object):
                 headers={'content-type': 'application/json'})
 
         if r.status_code != 201:
-            return False
+            r.content
 
         return r.json()
 
@@ -64,12 +64,12 @@ class Tournamenter(object):
                 'groupId': groupID,
                 'day': day,
                 'field': field,
-                'time': time,
+                'hour': time,
                 'state': state
             }), headers={'content-type': 'application/json'})
 
         if r.status_code != 201:
-            return False
+            return r.content
         
         return r.json()
 
