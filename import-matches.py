@@ -29,7 +29,7 @@ with open(filename) as f:
         if i < 5: continue
         if len(row) != 6: break
 
-        print("Inserting: {0!}".format(row))
+        print("Inserting: {0!r}".format(row))
         teamA = row[0].strip()
         teamB = row[1].strip()
         field = row[2].strip()
@@ -41,7 +41,7 @@ with open(filename) as f:
         match_time = row[5].strip()[:5]
 
 
-        print("Got back: {0!}".format(t.add_match(teamA, teamB, day, field, match_time, group)))
+        print("Got back: {0!r}".format(t.add_match(teamA, teamB, day, field, match_time, group)))
         
         #matches.append((teamA, teamB, field, day, match_time))
 
