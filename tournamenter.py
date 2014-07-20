@@ -68,11 +68,11 @@ class Tournamenter(object):
     def add_match(self, teamA, teamB, day, field, time, group,
             state="scheduled"):
 
-        if type(teamA) != "int":
+        if type(teamA) != int:
             teamA = self.team_info(teamA)['id']
-        if type(teamB) != "int":
+        if type(teamB) != int:
             teamB = self.team_info(teamB)['id']
-        if type(group) != "int":
+        if type(group) != int:
             group = self.find_group_id(group)
 
         r = self.session.post(self.url + '/matches', json.dumps({
@@ -92,9 +92,9 @@ class Tournamenter(object):
 
     def find_match_id(self, teamA, teamB, field, day):
 
-        if type(teamA) != "int":
+        if type(teamA) != int:
             teamA = self.team_info(teamA)['id']
-        if type(teamB) != "int":
+        if type(teamB) != int:
             teamB = self.team_info(teamB)['id']
 
         r = self.session.post(self.url + '/matches/find', json.dumps({
@@ -113,7 +113,13 @@ class Tournamenter(object):
         return r.json()[0]['id']
 
 
-    def update_match(self, teamA, teamB, field, day, teamAScore, teamBScore):
+    def update_match(self, teamA, teamB, field, day, teamAScore, teamBScore,
+            state="scheduled"):
+        if type(teamA) != int:
+            teamA = self.team_info(teamA)['id']
+        if type(teamB) != int:
+            teamB = self.team_info(teamB)['id']
+
         id = self.find_match_id(teamA, teamB, field, day)
 
         r =  self.session.post(self.url + '/matches/update', json.dumps({
@@ -123,7 +129,8 @@ class Tournamenter(object):
                 'day': day,
                 'teamAScore': teamAScore,
                 'teamBScore': teamBScore,
-                'id': id
+                'id': id,
+                'state': state
             }), headers={'content-type': 'application/json'})
 
         if r.status_code != 200:
