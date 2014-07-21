@@ -27,6 +27,8 @@ with open(filename) as f:
         
         # skipping the headline
         if i < 5: continue
+        if len(row) == 7:
+            row = row[1:]
         if len(row) != 6: break
 
         print("Inserting: {0!r}".format(row))
